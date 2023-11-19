@@ -13,6 +13,7 @@ namespace browser
         TaskPoolGlobalHook hook = new TaskPoolGlobalHook();
         TabPage plus = new TabPage();
         string? masterPassword = null;
+        private bool secureMode = false;
 
         public bool LControlPressed { get; private set; }
 
@@ -189,8 +190,9 @@ namespace browser
                     // invoke delegate to main thread
                     Invoke(new Action(() =>
                     {
-                        tabs.Visible = false;
+                        container.Visible = false;
                         secureBox.Visible = true;
+                        secureMode = true;
                         secureBox.Left =
                         (container.Panel2.Width - secureBox.Width) / 2;
 
@@ -271,7 +273,8 @@ namespace browser
             {
                 secureBox.Visible = false;
                 parola.Text = "";
-                tabs.Visible = true;
+                container.Visible = true;
+                secureMode = false;
             }
             else
             {
@@ -284,7 +287,8 @@ namespace browser
             if (WindowState == FormWindowState.Minimized)
             {
                 secureBox.Visible = true;
-                tabs.Visible = false;
+                container.Visible = false;
+                secureMode = true;
             }
 
             if (WindowState == FormWindowState.Normal)
@@ -303,12 +307,14 @@ namespace browser
 
         private void Form1_ResizeBegin(object sender, EventArgs e)
         {
-            tabs.Visible = false;
+            if (secureMode == false)
+            container.Visible = false;
         }
 
         private void Form1_ResizeEnd(object sender, EventArgs e)
         {
-            tabs.Visible = true;
+            if (secureMode == false)
+                container.Visible = true;
         }
 
         private void geri_Click(object sender, EventArgs e)
