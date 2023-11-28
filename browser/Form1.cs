@@ -25,7 +25,20 @@ namespace browser
         #region UI
         void setSplitterDistanceFixed(int height)
         {
-            container.SplitterDistance = height;
+            try
+            {
+                if(container.Visible)
+                {
+                    container.SplitterDistance = height;
+                }
+            } catch (Exception err)
+            {
+                // log to file
+                using (var writer = new StreamWriter(Application.StartupPath + "\\log.txt", true))
+                {
+                    writer.WriteLine(err.Message);
+                }
+            }
         }
 
         void setContainerSize(int width, int height)
@@ -173,7 +186,11 @@ namespace browser
 
             buildTabs();
             secureBox.Parent = this;
-            await hook.RunAsync();
+            var thread = new Thread(async () =>
+            {
+                await hook.RunAsync();
+            });
+            thread.Start();
         }
 
         private void Hook_KeyReleased(object? sender, KeyboardHookEventArgs e)
@@ -240,7 +257,7 @@ namespace browser
 
         private void container_SplitterMoving(object sender, SplitterCancelEventArgs e)
         {
-            setSplitterDistanceFixed(50);
+            setSplitterDistanceFixed(58);
         }
 
         private void Form1_Resize(object sender, EventArgs e)
@@ -286,17 +303,36 @@ namespace browser
         {
             if (WindowState == FormWindowState.Minimized)
             {
-                secureBox.Visible = true;
-                container.Visible = false;
-                secureMode = true;
+                try
+                {
+                    secureBox.Visible = true;
+                    container.Visible = false;
+                    secureMode = true;
+                } catch (Exception err)
+                {
+                    // log to file
+                    using (var writer = new StreamWriter(Application.StartupPath + "\\log.txt", true))
+                    {
+                        writer.WriteLine(err.Message);
+                    }
+                }
             }
 
             if (WindowState == FormWindowState.Normal)
             {
-                secureBox.Left =
+                try
+                {
+                    secureBox.Left =
                      (container.Panel2.Width - secureBox.Width) / 2;
 
-                secureBox.Top = (container.Panel2.Height - secureBox.Height) / 2;
+                    secureBox.Top = (container.Panel2.Height - secureBox.Height) / 2;
+                } catch (Exception err) { 
+                    // log to file
+                    using (var writer = new StreamWriter(Application.StartupPath + "\\log.txt", true))
+                    {
+                        writer.WriteLine(err.Message);
+                    }
+                }
             }
         }
 
